@@ -15,8 +15,8 @@ def main(pagina):
         pagina.add(chat, linha_enviar_chat)
         usuario = usuario_modal.value
 
-        mensagem_texto = ft.Text(f"{usuario} entrou no chat")
-        chat.controls.append(mensagem_texto)
+        texto_chat = f"{usuario} entrou no chat"
+        pagina.pubsub.send_all(texto_chat)
         
         pagina.update()
 
@@ -26,11 +26,16 @@ def main(pagina):
         mensagem_usuario = mensagem_chat.value
         mensagem_chat.value = ""  # limpa o campo
 
-        mensagem_texto = ft.Text(f"{nome_usuario}: {mensagem_usuario}")
-        chat.controls.append(mensagem_texto)
+        texto_chat = f"{nome_usuario}: {mensagem_usuario}"
+        pagina.pubsub.send_all(texto_chat)
 
         pagina.update()
 
+
+    def enviar_mensagem_tunel(texto_chat):
+        mensagem = ft.Text(texto_chat)
+        chat.controls.append(mensagem)
+        pagina.update()
 
 
     # elementos pagina inicial
@@ -50,5 +55,7 @@ def main(pagina):
     linha_enviar_chat = ft.Row([mensagem_chat, botao_chat])
     chat = ft.Column()
 
+    # tunel de comunicação
+    pagina.pubsub.subscribe(enviar_mensagem_tunel)
 
-ft.app(main)
+ft.app(main, view=ft.WEB_BROWSER)
